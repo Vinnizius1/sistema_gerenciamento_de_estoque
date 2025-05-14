@@ -1,0 +1,18 @@
+{
+    "1": {
+        "id": 1,
+        "nome": "ps5",
+        "categoria": "games",
+        "quantidade": 144,
+        "preco": 100.0,
+        "estoque_minimo": 11
+    },
+    "2": {
+        "id": 2,
+        "nome": "xbox",
+        "categoria": "games",
+        "quantidade": 11,
+        "preco": 140.0,
+        "estoque_minimo": 100
+    }
+}

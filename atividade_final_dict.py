@@ -11,36 +11,48 @@ Este sistema permite:
 IMPORTANTE: O princípio de clareza do Python ("Explicit is better than implicit") - de Guido van Rossum.
 """
 
+# Importa biblioteca para manipulação de arquivos JSON
+import json 
+
+# Funções para persistência
+def salvar_dados():
+    """Salva os dados do dicionário em arquivo JSON"""
+    try:
+        with open('produtos.json', 'w', encoding='utf-8') as arquivo:
+            json.dump(produtos, arquivo, indent=4, ensure_ascii=False)
+        print("\nDados salvos com sucesso!")
+    except Exception as e:
+        print(f"\nErro ao salvar dados: {str(e)}")
+
+def carregar_dados():
+    """Carrega os dados do arquivo JSON para o dicionário"""
+    global produtos, proximo_id_disponivel
+    try:
+        with open('produtos.json', 'r', encoding='utf-8') as arquivo:
+            produtos_carregados = json.load(arquivo) # 1. Carrega do JSON
+            # Converte as chaves do dicionário de string para inteiro
+            produtos = {int(k): v for k, v in produtos_carregados.items()} # Dictionary comprehension -> converte tipos
+            # é equivalente a (sem list comprehension):
+            '''
+            novo_dicionario = {}
+            for chave, valor in produtos_carregados.items():
+                novo_dicionario[int(chave)] = valor
+            '''
+        # Atualiza o próximo ID disponível
+        proximo_id_disponivel = max(produtos.keys(), default=0) + 1
+        print("\nDados carregados com sucesso!")
+    except FileNotFoundError:
+        produtos = {}
+        proximo_id_disponivel = 1
+        print("\nNenhum arquivo de dados encontrado. Iniciando com dicionário vazio.")
+    except Exception as e:
+        print(f"\nErro ao carregar dados: {str(e)}")
+
 # Estrutura principal: dicionário de produtos
 # - Chave externa: ID do produto (inteiro)
 # - Valor: dicionário com dados do produto
 # Exemplo de acesso: produtos.get(1) retorna o produto com ID 1
-produtos = {
-    1: {
-        'id': 1, # Manter o ID interno pode ser útil para consistência ou se o objeto for passado isoladamente
-        'nome': 'Notebook Dell',
-        'categoria': 'Eletrônicos',
-        'quantidade': 15,
-        'preco': 3500.00,
-        'estoque_minimo': 5
-    },
-    2: {
-        'id': 2,
-        'nome': 'Mouse Bluetooth',
-        'categoria': 'Periféricos',
-        'quantidade': 30,
-        'preco': 120.00,
-        'estoque_minimo': 10
-    },
-    3: {
-        'id': 3,
-        'nome': 'Teclado Mecânico',
-        'categoria': 'Periféricos',
-        'quantidade': 20,
-        'preco': 250.00,
-        'estoque_minimo': 8
-    }
-}
+produtos = {}
 
 # Inicialização do contador de IDs
 if not produtos: 
@@ -513,19 +525,27 @@ def listar_todos_produtos():
 # Função principal
 def main():
     """Função principal que executa o programa"""
+    # Carrega os dados do arquivo JSON ao iniciar o programa
+    carregar_dados()
+
     while True:
         opcao = exibir_menu()
         
         if opcao == '1':
             cadastrar_produto()
+            salvar_dados() # Salva os dados após cada cadastro
         elif opcao == '2':
             remover_produto()
+            salvar_dados()
         elif opcao == '3':
             editar_produto()
+            salvar_dados()
         elif opcao == '4':
             registrar_entrada()
+            salvar_dados()
         elif opcao == '5':
             registrar_saida()
+            salvar_dados()
         elif opcao == '6':
             consultar_produto()
         elif opcao == '7':
